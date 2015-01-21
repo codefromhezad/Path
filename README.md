@@ -1,4 +1,4 @@
-# Path, a modular raytracer in the browser.
+# Path, a modular raytracer for the browser.
 
 ## Developers
 
