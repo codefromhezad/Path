@@ -62,7 +62,7 @@ Renderer.zBuffer = function(opts) {
 		maxDepth: 20 
 	}
 
-	opts = extend(this.defaults, opts);
+	this.options = extend(this.defaults, opts);
 
 	this.getColor = function(intersection) {
 		if( intersection ) {
@@ -70,13 +70,13 @@ Renderer.zBuffer = function(opts) {
 			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
 			var zValue = hitPosition.elements[2];
 
-			if( zValue < opts.minDepth ) {
-				zValue = opts.minDepth;
+			if( zValue < this.options.minDepth ) {
+				zValue = this.options.minDepth;
 			}
-			if( zValue > opts.maxDepth ) {
-				zValue = opts.maxDepth;
+			if( zValue > this.options.maxDepth ) {
+				zValue = this.options.maxDepth;
 			}
-			zValue /= (opts.maxDepth - opts.minDepth);
+			zValue /= (this.options.maxDepth - this.options.minDepth);
 
 			return new Color(zValue);
 		}

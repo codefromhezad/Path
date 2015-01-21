@@ -52,6 +52,10 @@
 				this.objects = [];
 
 				this.boot = function(canvasId) {
+					if( DEBUG ) {
+						console.log('Booting engine.');
+					}
+
 					this.canvas = document.getElementById(canvasId);
 					this.ctx    = this.canvas.getContext('2d');
 					this.width  = this.canvas.width;
@@ -65,6 +69,25 @@
 
 					for(var i = 0; i < this.width; i++) {
 						this.screenBuffer[i] = [];
+					}
+				}
+
+				this.setRenderer = function(rendererName, opts) {
+					if( DEBUG ) {
+						console.log('Loading "'+rendererName+'" renderer.');
+					}
+
+					var rendererComponent = Renderer[rendererName];
+
+					if( rendererComponent ) {
+						this.renderer = new rendererComponent(opts);
+
+						if( DEBUG && this.renderer.defaults ) {
+							console.log(' + Renderer settings: ');
+							console.log('   > ', this.renderer.options);
+						}
+					} else {
+						console.error('Can\'t find any renderer called "'+rendererName+'"');
 					}
 				}
 
@@ -106,7 +129,7 @@
 			/* Start */
 			Engine.boot('preview-canvas');
 
-			Engine.renderer = new Renderer.pathtracer();
+			Engine.setRenderer('zBuffer', {maxDepth: 15});
 			Engine.camera = new Camera.orthographic( $V([0, 1, -20]), 20, 10);
 
 			Engine.objects.push(new Entity.sphere( $V([-5, 1, 10]), 4));

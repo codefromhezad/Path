@@ -1,4 +1,8 @@
 
+/* Development constants */
+var DEBUG = true;
+
+
 /* Internal constants */
 var INTERSECT_OK = 1;
 var INTERSECT_MISS = 0;
