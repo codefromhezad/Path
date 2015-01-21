@@ -1,6 +1,6 @@
 var Renderer = {};
 
-Renderer.pathtracing = function() {
+Renderer.pathtracer = function() {
 
 	this.getColor = function(intersection) {
 		if( intersection ) {
@@ -19,36 +19,41 @@ Renderer.pathtracing = function() {
 
 				var newIntersect = Pathtracer.traceRay(new Ray(newOrigin, newDir)); 
 				if( ! newIntersect ) {
-					return [luminance, luminance, luminance];
+					return new Color(luminance);
 				}
 			}
 		}
 
-		return [0.0, 0.0, 0.0];
+		return new Color(0.0);
 	}
 }
 
-
-var DEFAULT_ZBUFFER_DEPTH_SCALE  = 10;
-var DEFAULT_ZBUFFER_DEPTH_OFFSET = 0;
-
 Renderer.zBuffer = function(opts) {
 
-	if( ! opts ) { opts = {}; }
+	this.defaults = {
+		minDepth: 0,
+		maxDepth: 20 
+	}
 
-	this.depthScale = opts.depthScale ? opts.depthScale : DEFAULT_ZBUFFER_DEPTH_SCALE;
-	this.depthScaleMultiplier = 1.0 / this.depthScale;
-
-	this.depthOffset = opts.depthOffset ? opts.depthOffset : DEFAULT_ZBUFFER_DEPTH_OFFSET;
+	opts = extend(this.defaults, opts);
 
 	this.getColor = function(intersection) {
 		if( intersection ) {
-			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
-			var zValue = this.depthOffset + hitPosition.elements[2] * this.depthScaleMultiplier;
 
-			return [zValue, zValue, zValue];
+			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
+			var zValue = hitPosition.elements[2];
+
+			if( zValue < opts.minDepth ) {
+				zValue = opts.minDepth;
+			}
+			if( zValue > opts.maxDepth ) {
+				zValue = opts.maxDepth;
+			}
+			zValue /= (opts.maxDepth - opts.minDepth);
+			
+			return new Color(zValue);
 		}
 
-		return [0.0, 0.0, 0.0];
+		return new Color(0.0);
 	}
 }

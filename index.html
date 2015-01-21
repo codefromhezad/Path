@@ -5,6 +5,8 @@
 
 		<script src="vendor/sylvester.js"></script>
 		<script src="constants.js"></script>
+		<script src="utils.js"></script>
+		<script src="color.js"></script>
 		<script src="renderers.js"></script>
 		<script src="cameras.js"></script>
 		<script src="entities.js"></script>
@@ -51,6 +53,8 @@
 
 			var Pathtracer = new (function() {
 
+				this.screenBuffer = [];
+
 				this.camera;
 				this.renderer;
 				this.objects = [];
@@ -66,6 +70,10 @@
 					this.imageBuffer = this.imageData.data;
 
 					this.aspectRatio = this.height / this.width;
+
+					for(var i = 0; i < this.width; i++) {
+						this.screenBuffer[i] = [];
+					}
 				}
 
 				this.traceRay = function(ray) {
@@ -98,24 +106,21 @@
 
 							var ray = this.camera.getRay(x, y);
 							var intersect = this.traceRay(ray);
-							var c = this.renderer.getColor(intersect);
-
-							this.setPixel(x, y, c[0] * 255, c[1] * 255, c[2] * 255);
+							
+							var finalColor = this.renderer.getColor(intersect);
+							this.setPixel(x, y, finalColor.to255());
 						}
 					}
 
 					this.flush();
 				}
 
-				this.setPixel = function(x, y, r, g, b, a) {
-					if( a === undefined ) { 
-						a = 255;
-					}
+				this.setPixel = function(x, y, color) {
 					var index = ( (x|0) + (y|0) * this.width) * 4;
-				    this.imageBuffer[index+0] = r | 0;
-				    this.imageBuffer[index+1] = g | 0;
-				    this.imageBuffer[index+2] = b | 0;
-				    this.imageBuffer[index+3] = a | 0;
+				    this.imageBuffer[index+0] = color.r | 0;
+				    this.imageBuffer[index+1] = color.g | 0;
+				    this.imageBuffer[index+2] = color.b | 0;
+				    this.imageBuffer[index+3] = color.a | 0;
 				}
 
 				this.flush = function() {
@@ -126,12 +131,12 @@
 			/* Start */
 			Pathtracer.boot('preview-canvas');
 
-			Pathtracer.renderer = new Renderer.zBuffer({depthScale: 10, depthOffset: 0});
+			Pathtracer.renderer = new Renderer.zBuffer();
 			Pathtracer.camera = new Camera.orthographic( $V([0, 1, -20]), 20, 10);
 
 			Pathtracer.objects.push(new Entity.sphere( $V([-3, 1, 10]), 4));
 			Pathtracer.objects.push(new Entity.sphere( $V([3, 1, 10]), 4));
-			Pathtracer.objects.push(new Entity.sphere( $V([0, -47, 50]), 50));
+			Pathtracer.objects.push(new Entity.plane( $V([0, -3, 11]), $V([0, 0.8, -0.2])));
 
 			Pathtracer.render();
 		</script>
