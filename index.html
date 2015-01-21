@@ -18,7 +18,8 @@
 
 			var globals = {
 				currentScreenX: 0,
-				currentScreenY: 0
+				currentScreenY: 0,
+				currentSeedVector: null
 			}
 
 			var Ray = function(origin, direction) {
@@ -73,21 +74,24 @@
 				}
 
 				this.setRenderer = function(rendererName, opts) {
-					if( DEBUG ) {
-						console.log('Loading "'+rendererName+'" renderer.');
-					}
-
 					var rendererComponent = Renderer[rendererName];
 
 					if( rendererComponent ) {
+						if( DEBUG ) {
+							console.log('Using "'+rendererName+'" renderer.');
+						}
+
 						this.renderer = new rendererComponent(opts);
 
 						if( DEBUG && this.renderer.defaults ) {
 							console.log(' + Renderer settings: ');
 							console.log('   > ', this.renderer.options);
 						}
+
+						return true;
 					} else {
 						console.error('Can\'t find any renderer called "'+rendererName+'"');
+						return false;
 					}
 				}
 
@@ -95,6 +99,15 @@
 					if( ! this.camera ) {
 						console.error('A camera must be defined.');
 						return;
+					}
+					if( ! this.renderer ) {
+						console.error('A renderer must be defined.');
+						return;
+					}
+
+					if( DEBUG ) {
+						console.log('Starting render ...');
+						var startTime = Math.floor(Date.now() / 1000);
 					}
 
 					for(var y = 0; y < this.height; y++) {
@@ -108,6 +121,18 @@
 							var finalColor = this.renderer.getColor(intersect);
 							this.setPixel(x, y, finalColor.to255());
 						}
+
+						if( DEBUG ) {
+							var perTen = (100 * (y + 1) / this.height);
+							if( perTen % 10 == 0 ) {
+								console.log(perTen + "%");
+							}
+						}
+					}
+
+					if( DEBUG ) {
+						var finishTime = Math.floor(Date.now() / 1000);
+						console.log('Done. Image rendered in '+(finishTime - startTime)+' seconds.');
 					}
 
 					this.flush();
@@ -129,7 +154,7 @@
 			/* Start */
 			Engine.boot('preview-canvas');
 
-			Engine.setRenderer('zBuffer', {maxDepth: 15});
+			Engine.setRenderer('pathtracer');
 			Engine.camera = new Camera.orthographic( $V([0, 1, -20]), 20, 10);
 
 			Engine.objects.push(new Entity.sphere( $V([-5, 1, 10]), 4));

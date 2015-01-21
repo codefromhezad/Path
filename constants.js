@@ -3,7 +3,12 @@
 var DEBUG = true;
 
 
-/* Internal constants */
+
+
+/* The next constants must not be updated. */
+/* Do not change anything under this line. */
+
+/* Status constants */
 var INTERSECT_OK = 1;
 var INTERSECT_MISS = 0;
 
