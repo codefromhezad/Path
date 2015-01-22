@@ -1,12 +1,19 @@
 var Camera = {};
 
-Camera.orthographic = function(position, viewportWidth, viewportDistance) {
-	this.position = position;
-	this.viewportWidth = viewportWidth;
-	this.viewportHeight = viewportWidth * Engine.aspectRatio;
-	
-	this.viewportDistance = viewportDistance;
-	this.position.elements[2] -= viewportDistance;
+Camera.orthographic = function(opts) {
+	this.defaults = {
+		position: $V([0, 0, -2]),
+		viewportWidth: 20,
+		viewportDistance: 10
+	}
+	this.options = extend(this.defaults, opts);
+
+	this.position = this.options.position;
+	this.viewportWidth = this.options.viewportWidth;
+	this.viewportHeight = this.options.viewportWidth * Engine.aspectRatio;
+	this.viewportDistance =this.options.viewportDistance;
+
+	this.position.elements[2] -= this.viewportDistance;
 
 	this.getRay = function(x, y) {
 		var d = $V([0, 0, 1]);

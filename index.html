@@ -76,20 +76,33 @@
 					var rendererComponent = Renderer[rendererName];
 
 					if( rendererComponent ) {
-						if( DEBUG ) {
-							console.log('Using "'+rendererName+'" renderer.');
-						}
-
 						this.renderer = new rendererComponent(opts);
 
 						if( DEBUG && this.renderer.defaults ) {
-							console.log(' + Renderer settings: ');
-							console.log('   > ', this.renderer.options);
+							console.log('[Renderer | "'+rendererName+'"] + Settings: ', this.renderer.options);
 						}
 
 						return true;
 					} else {
 						console.error('Can\'t find any renderer called "'+rendererName+'"');
+						return false;
+					}
+				}
+
+				this.setCamera = function(cameraName, opts) {
+					var cameraComponent = Camera[cameraName];
+
+					if( cameraComponent ) {
+
+						this.camera = new cameraComponent(opts);
+
+						if( DEBUG ) {
+							console.log('[Camera | "'+cameraName+'"] + Settings: ', opts);
+						}
+
+						return true;
+					} else {
+						console.error('Can\'t find any camera called "'+cameraName+'"');
 						return false;
 					}
 				}
@@ -105,7 +118,7 @@
 					}
 
 					if( DEBUG ) {
-						console.log('Starting render ...');
+						console.log('[Engine] Starting render ...');
 						var startTime = Math.floor(Date.now() / 1000);
 					}
 
@@ -123,14 +136,14 @@
 						if( DEBUG ) {
 							var perTen = (100 * (y + 1) / this.height);
 							if( perTen % 10 == 0 ) {
-								console.log(perTen + "%");
+								console.log(' > ' + perTen + "%");
 							}
 						}
 					}
 
 					if( DEBUG ) {
 						var finishTime = Math.floor(Date.now() / 1000);
-						console.log('Done. Image rendered in '+(finishTime - startTime)+' seconds.');
+						console.log('[Engine] Done. Image rendered in '+(finishTime - startTime)+' seconds.');
 					}
 
 					this.flush();
@@ -153,7 +166,11 @@
 			Engine.boot('preview-canvas');
 
 			Engine.setRenderer('pathtracer', {traceDepth: 16});
-			Engine.camera = new Camera.orthographic( $V([0, 1, -20]), 20, 10);
+			Engine.setCamera('orthographic', {
+				position: $V([0, 1, -20]),
+				viewportWidth: 20,
+				viewportDistance: 10
+			});
 
 			Engine.objects.push(new Entity.sphere( $V([-5, 1, 10]), 4));
 			Engine.objects.push(new Entity.sphere( $V([4, 1, 10]), 4));
