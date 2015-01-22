@@ -35,6 +35,10 @@ var Debug = new (function(is_active) {
 	}
 
 	this.startProcess = function(processNiceName) {
+		if( ! this.is_active ) {
+			return;
+		}
+
 		this.processNiceName = processNiceName;
 		this.timerStartDate = Math.floor(Date.now() / 1000);
 
@@ -50,6 +54,10 @@ var Debug = new (function(is_active) {
 	}
 
 	this.updateProgress = function(currentValue, finalValue, addItemEveryNPercent) {
+		if( ! this.is_active ) {
+			return;
+		}
+
 		if( addItemEveryNPercent === undefined ) {
 			addItemEveryNPercent = 10;
 		}
@@ -60,6 +68,10 @@ var Debug = new (function(is_active) {
 	}
 
 	this.stopProcess = function() {
+		if( ! this.is_active ) {
+			return;
+		}
+		
 		var finishTime = Math.floor(Date.now() / 1000);
 		$('.__path_progress_status').html('Done in <em>'+(finishTime - this.timerStartDate)+'</em> seconds');
 		this.processNiceName = null;
