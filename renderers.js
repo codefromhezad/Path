@@ -7,8 +7,6 @@ Renderer.pathtracer = function(opts) {
 	}
 	this.options = extend(this.defaults, opts);
 
-	this.seedVector = null;
-
 	this.getRandomVectorInHemisphere = function(normal) {
 		var dir = normal.toUnitVector();
 		var rndDir = $V([-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2]);
@@ -30,11 +28,6 @@ Renderer.pathtracer = function(opts) {
 			var matColor = 0.45;
 
 			for(var i = 0; i < this.options.traceDepth; i++) {
-				this.seedVector = $V([
-					globals.currentScreenX,
-					globals.currentScreenY
-				]).multiply(i);
-
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
 				luminance *= 2.0 * matColor * Albedo * newDir.dot(hitNormal);
 				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_DIST * 2))
