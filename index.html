@@ -153,7 +153,7 @@
 			/* Start */
 			Engine.boot('preview-canvas');
 
-			Engine.setRenderer('pathtracer', {traceDepth: 20});
+			Engine.setRenderer('pathtracer', {traceDepth: 10});
 			Engine.camera = new Camera.orthographic( $V([0, 1, -20]), 20, 10);
 
 			Engine.objects.push(new Entity.sphere( $V([-5, 1, 10]), 4));

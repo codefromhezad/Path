@@ -18,6 +18,10 @@ Renderer.pathtracer = function(opts) {
 		return rndDir;
 	}
 
+	this.getBackground = function(direction) {
+		return new Color(1.0);
+	}
+
 	this.getColor = function(intersection) {
 		if( intersection ) {
 			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
@@ -30,13 +34,16 @@ Renderer.pathtracer = function(opts) {
 			for(var i = 0; i < this.options.traceDepth; i++) {
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
 				luminance *= 2.0 * matColor * Albedo * newDir.dot(hitNormal);
-				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_DIST * 2))
+				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_DIST * 2));
 
 				var newRay = new Ray(newOrigin, newDir);
-
 				var newIntersect = newRay.cast(Engine.objects); 
-				if( ! newIntersect ) {
-					return new Color(luminance);
+				
+				if( newIntersect ) {
+					hitPosition = newIntersect.ray.origin.add(newIntersect.ray.direction.multiply(newIntersect.distance));
+					hitNormal = newIntersect.object.getNormal(hitPosition);
+				} else {
+					return (new Color(luminance)).multiply(this.getBackground(newDir));
 				}
 			}
 		}

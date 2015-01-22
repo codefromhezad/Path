@@ -1,19 +1,42 @@
 var Color = function(r, g, b) {
-	this.r;
-	this.g;
-	this.b;
+	this.is_color_object = true;
+
+	this.r = r;
+	this.g = g;
+	this.b = b;
 	this.a = 1.0;
 
 	this.value = null;
 	this.is_greyscale = false;
 
-	if( r && (g === undefined || b === undefined) ) {
+	this.update = function() {
+		if( (this.r !== undefined && (this.g === undefined || this.b === undefined)) ||
+		    (this.r == this.g == this.b)
+		) {
+			this.setGreyscale(this.r);
+		} else if( r === undefined ) {
+			this.setGreyscale(0.0);
+		} 
+		return this;
+	}
+
+	this.setGreyscale = function(value) {
 		this.is_greyscale = true;
 		this.value = r;
 
 		this.r     = this.value;
 		this.g     = this.value;
 		this.b     = this.value;
+	}
+
+	this.multiply = function(v) {
+		var newColor = new Color(
+			this.r * v.r,
+			this.g * v.g,
+			this.b * v.b
+		);
+		newColor.update();
+		return newColor;
 	}
 
 	this.setAlpha = function(alpha) {
@@ -28,4 +51,6 @@ var Color = function(r, g, b) {
 			a: this.a * 255
 		};
 	}
+
+	this.update();
 }
