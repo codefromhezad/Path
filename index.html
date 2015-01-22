@@ -59,10 +59,6 @@
 				this.objects = [];
 
 				this.boot = function(canvasId) {
-					if( DEBUG ) {
-						console.log('[Engine] Booting.');
-					}
-
 					this.canvas = document.getElementById(canvasId);
 					this.ctx    = this.canvas.getContext('2d');
 					this.width  = this.canvas.width;
@@ -73,6 +69,10 @@
 					this.imageBuffer = this.imageData.data;
 
 					this.aspectRatio = this.height / this.width;
+
+					if( DEBUG ) {
+						console.log('[Engine] Booting. Resolution: ('+this.width+','+this.height+'), Aspect Ratio (h/w): '+this.aspectRatio);
+					}
 
 					for(var i = 0; i < this.width; i++) {
 						this.screenBuffer[i] = [];
