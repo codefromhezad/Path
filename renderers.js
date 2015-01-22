@@ -43,8 +43,8 @@ Renderer.pathtracer = function(opts) {
 				intersection = newRay.cast(Engine.objects); 
 				
 				if( intersection ) {
-					hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
-					hitNormal = intersection.object.getNormal(hitPosition);
+					hitPosition = intersection.ray.lastHitPosition;
+					hitNormal = intersection.ray.lastHitNormal;
 				} else {
 					return luminance.multiply(this.getBackground(newDir));
 				}

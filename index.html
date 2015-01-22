@@ -87,7 +87,7 @@
 						this.renderer = new rendererComponent(opts);
 
 						if( DEBUG && this.renderer.defaults ) {
-							console.log('[Renderer | "'+rendererName+'"] + Settings: ', this.renderer.options);
+							console.log('[Renderer|'+rendererName+'] + Settings: ', this.renderer.options);
 						}
 
 						return true;
@@ -105,7 +105,7 @@
 						this.camera = new cameraComponent(opts);
 
 						if( DEBUG ) {
-							console.log('[Camera | "'+cameraName+'"] + Settings: ', opts);
+							console.log('[Camera|'+cameraName+'] + Settings: ', opts);
 						}
 
 						return true;
