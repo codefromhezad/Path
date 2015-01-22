@@ -28,14 +28,14 @@ Renderer.pathtracer = function(opts) {
 		if( intersection ) {
 			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
 			var hitNormal = intersection.object.getNormal(hitPosition);
-			var luminance = 1.0;
+			var luminance = new Color(1.0);
 
 			var Albedo = 1.2;
 			var matColor = 0.45;
 
 			for(var i = 0; i < this.options.traceDepth; i++) {
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
-				luminance *= 2.0 * matColor * Albedo * newDir.dot(hitNormal);
+				luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
 				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_DIST * 2));
 
 				var newRay = new Ray(newOrigin, newDir);
@@ -45,7 +45,7 @@ Renderer.pathtracer = function(opts) {
 					hitPosition = newIntersect.ray.origin.add(newIntersect.ray.direction.multiply(newIntersect.distance));
 					hitNormal = newIntersect.object.getNormal(hitPosition);
 				} else {
-					return (new Color(luminance)).multiply(this.getBackground(newDir));
+					return luminance.multiply(this.getBackground(newDir));
 				}
 			}
 		}

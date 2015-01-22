@@ -30,6 +30,10 @@ var Color = function(r, g, b) {
 	}
 
 	this.multiply = function(v) {
+		if( isNumber(v) ) {
+			v = new Color(v);
+		}
+		
 		var newColor = new Color(
 			this.r * v.r,
 			this.g * v.g,
