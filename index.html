@@ -25,6 +25,9 @@
 				this.origin = origin;
 				this.direction = direction;
 
+				this.lastHitPosition = null;
+				this.lastHitNormal = null;
+
 				this.cast = function(sceneObjects) {
 					var nearestIntersection = null;
 
@@ -37,6 +40,11 @@
 								nearestIntersection = intersection;
 							}
 						}
+					}
+
+					if( nearestIntersection ) {
+						this.lastHitPosition = nearestIntersection.ray.origin.add(nearestIntersection.ray.direction.multiply(nearestIntersection.distance));
+						this.lastHitNormal = nearestIntersection.object.getNormal(this.lastHitPosition);
 					}
 
 					return nearestIntersection;

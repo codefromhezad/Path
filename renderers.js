@@ -26,8 +26,9 @@ Renderer.pathtracer = function(opts) {
 		var intersection = initialRay.cast(Engine.objects);
 
 		if( intersection ) {
-			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
-			var hitNormal = intersection.object.getNormal(hitPosition);
+			var hitPosition = intersection.ray.lastHitPosition;
+			var hitNormal = intersection.ray.lastHitNormal;
+
 			var luminance = new Color(1.0);
 
 			var Albedo = 1.2;
@@ -39,18 +40,18 @@ Renderer.pathtracer = function(opts) {
 				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_DIST * 2));
 
 				var newRay = new Ray(newOrigin, newDir);
-				var newIntersect = newRay.cast(Engine.objects); 
+				intersection = newRay.cast(Engine.objects); 
 				
-				if( newIntersect ) {
-					hitPosition = newIntersect.ray.origin.add(newIntersect.ray.direction.multiply(newIntersect.distance));
-					hitNormal = newIntersect.object.getNormal(hitPosition);
+				if( intersection ) {
+					hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
+					hitNormal = intersection.object.getNormal(hitPosition);
 				} else {
 					return luminance.multiply(this.getBackground(newDir));
 				}
 			}
 		}
 
-		return new Color(0.0);
+		return this.getBackground(initialRay.direction);
 	}
 }
 
