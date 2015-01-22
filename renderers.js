@@ -51,28 +51,26 @@ Renderer.pathtracer = function(opts) {
 			luminance = new Color(1.0);
 		}
 
-		if( depth >= this.options.traceDepth ) {
-			return this.getBackground(initialRay.direction);
+		if( depth < this.options.traceDepth ) {
+			var intersection = initialRay.cast(Engine.objects);
+
+			if( intersection ) {
+				var hitPosition = intersection.ray.lastHitPosition;
+				var hitNormal = intersection.ray.lastHitNormal;
+
+				globals.scaledSeed = globals.seed2d.multiply(depth + 1);
+
+				var newDir = this.getRandomVectorInHemisphere(hitNormal);
+				luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
+				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_VECTOR_DIST_ADD * 2));
+
+				var newRay = new Ray(newOrigin, newDir);
+				
+				return this.getColorForRay(newRay, luminance, depth + 1);
+			}
 		}
-
-		var intersection = initialRay.cast(Engine.objects);
-
-		if( intersection ) {
-			var hitPosition = intersection.ray.lastHitPosition;
-			var hitNormal = intersection.ray.lastHitNormal;
-
-			globals.scaledSeed = globals.seed2d.multiply(depth + 1);
-
-			var newDir = this.getRandomVectorInHemisphere(hitNormal);
-			luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
-			var newOrigin = hitPosition.add(hitNormal.multiply(MIN_VECTOR_DIST_ADD * 2));
-
-			var newRay = new Ray(newOrigin, newDir);
 			
-			return this.getColorForRay(newRay, luminance, depth + 1);
-		} else {
-			return luminance.multiply(this.getBackground(initialRay.direction));
-		}
+		return luminance.multiply(this.getBackground(initialRay.direction));
 	}
 }
 
