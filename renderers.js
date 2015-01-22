@@ -22,7 +22,9 @@ Renderer.pathtracer = function(opts) {
 		return new Color(1.0);
 	}
 
-	this.getColor = function(intersection) {
+	this.getColorForRay = function(initialRay) {
+		var intersection = initialRay.cast(Engine.objects);
+
 		if( intersection ) {
 			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
 			var hitNormal = intersection.object.getNormal(hitPosition);
@@ -60,7 +62,9 @@ Renderer.zBuffer = function(opts) {
 	}
 	this.options = extend(this.defaults, opts);
 
-	this.getColor = function(intersection) {
+	this.getColorForRay = function(initialRay) {
+		var intersection = initialRay.cast(Engine.objects);
+
 		if( intersection ) {
 
 			var hitPosition = intersection.ray.origin.add(intersection.ray.direction.multiply(intersection.distance));
