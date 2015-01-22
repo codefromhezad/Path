@@ -14,12 +14,12 @@ Renderer.pathtracer = function(opts) {
 	}
 
 	this.rand2D = function() {
-		globals.seed2d = globals.seed2d.add($V([-1, 1]));
-		var r = $V([
-			(Math.sin(globals.seed2d.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
-			(Math.cos(globals.seed2d.dot($V([14.898,7.23]))) * 23421.631) % 1
+		Engine.seed2d = Engine.seed2d.add($V([-1, 1]));
+		
+		return $V([
+			(Math.sin(Engine.seed2d.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
+			(Math.cos(Engine.seed2d.dot($V([14.898,7.23]))) * 23421.631) % 1
 		]);
-		return r;
 	}
 
 	this.getRandomVectorInHemisphere = function(normal) {
@@ -63,7 +63,7 @@ Renderer.pathtracer = function(opts) {
 
 		if( depth < this.options.traceDepth ) {
 
-			globals.seed2d = globals.seed2d.multiply(depth + 1);
+			Engine.seed2d = Engine.seed2d.multiply(depth + 1);
 
 			var intersection = initialRay.cast(Engine.objects);
 
