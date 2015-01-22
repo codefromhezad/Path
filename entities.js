@@ -55,7 +55,7 @@ Entity.sphere = function(position, radius) {
 Entity.plane = function(referencePoint, normal) {
 	
 	this.referencePoint = referencePoint;
-	this.normal = normal;
+	this.normal = normal.toUnitVector();
 
 	this.intersect = function(ray) {
 		var denom = this.normal.dot(ray.direction);

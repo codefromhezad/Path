@@ -27,6 +27,8 @@
 	background: #eee;
 	margin-right: 10px;
 	text-align: center;
+	font-size: 0.8em;
+	text-transform: uppercase;
 }
 
 .__path_debug_object {
