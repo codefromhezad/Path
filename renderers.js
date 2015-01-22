@@ -7,31 +7,35 @@ Renderer.pathtracer = function(opts) {
 	}
 	this.options = extend(this.defaults, opts);
 
-	this.ortho = function(v) {
+	this.getOrtho = function(v) {
 		return Math.abs(v.elements[0]) > Math.abs(v.elements[2]) ? 
 			$V([-v.elements[1], v.elements[0], 0.0]) :
 			$V([0.0, -v.elements[2], v.elements[1]]);
 	}
 
-	this.getRandomVectorInHemisphere = function(normal) {
-		var o1 = this.ortho(normal).toUnitVector();
-		var o2 = normal.cross(o1).toUnitVector();
-
+	this.rand2D = function() {
 		globals.seed2d = globals.seed2d.add($V([-1, 1]));
-
 		var r = $V([
 			(Math.sin(globals.seed2d.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
 			(Math.cos(globals.seed2d.dot($V([14.898,7.23]))) * 23421.631) % 1
 		]);
+		return r;
+	}
 
-		r.elements[0] = r.elements[0] * 2 * Math.PI;
+	this.getRandomVectorInHemisphere = function(normal) {
+		var o1 = this.getOrtho(normal);
+		var o2 = normal.cross(o1);
+		var r  = this.rand2D();
+
+		r.elements[0] = r.elements[0] * 2.0 * Math.PI;
+
 		var oneminus = Math.sqrt(1.0 - r.elements[1] * r.elements[1]);
 
 		var v1 = o1.multiply(oneminus * Math.cos(r.elements[0]));
 		var v2 = o2.multiply(oneminus * Math.sin(r.elements[0]));
 		var v3 = normal.multiply(r.elements[1]);
 
-		var finalVector = v1.add(v2).add(v3);
+		var finalVector = v1.add(v2.add(v3));
 
 		if( finalVector.dot(normal) < 0 ) {
 			finalVector = finalVector.multiply(-1);
@@ -60,7 +64,7 @@ Renderer.pathtracer = function(opts) {
 		if( depth < this.options.traceDepth ) {
 
 			globals.seed2d = globals.seed2d.multiply(depth + 1);
-			
+
 			var intersection = initialRay.cast(Engine.objects);
 
 			if( intersection ) {
