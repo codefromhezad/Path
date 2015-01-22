@@ -57,9 +57,10 @@ Renderer.pathtracer = function(opts) {
 			luminance = new Color(1.0);
 		}
 
-		globals.seed2d = globals.seed2d.multiply(depth + 1);
-
 		if( depth < this.options.traceDepth ) {
+
+			globals.seed2d = globals.seed2d.multiply(depth + 1);
+			
 			var intersection = initialRay.cast(Engine.objects);
 
 			if( intersection ) {

@@ -52,13 +52,10 @@ Entity.sphere = function(position, radius) {
 }
 
 
-var ENTITY_PLANE_DEFAULT_NORMAL = $V([0, 1, 0]);
-var ENTITY_PLANE_DEFAULT_REFERENCE_POINT = $V([0, 0, 0]);
-
 Entity.plane = function(referencePoint, normal) {
 	
-	this.referencePoint = referencePoint ? referencePoint : ENTITY_PLANE_DEFAULT_REFERENCE_POINT;
-	this.normal = normal ? normal : ENTITY_PLANE_DEFAULT_NORMAL;
+	this.referencePoint = referencePoint;
+	this.normal = normal;
 
 	this.intersect = function(ray) {
 		var denom = this.normal.dot(ray.direction);
