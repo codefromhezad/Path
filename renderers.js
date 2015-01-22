@@ -47,7 +47,7 @@ Renderer.pathtracer = function(opts) {
 
 			var newDir = this.getRandomVectorInHemisphere(hitNormal);
 			luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
-			var newOrigin = hitPosition.add(hitNormal.multiply(MIN_DIST * 2));
+			var newOrigin = hitPosition.add(hitNormal.multiply(MIN_VECTOR_DIST_ADD * 2));
 
 			var newRay = new Ray(newOrigin, newDir);
 			

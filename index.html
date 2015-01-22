@@ -61,7 +61,7 @@
 
 				this.boot = function(canvasId) {
 					if( DEBUG ) {
-						console.log('Booting engine.');
+						console.log('[Engine] Booting.');
 					}
 
 					this.canvas = document.getElementById(canvasId);
@@ -126,7 +126,7 @@
 					}
 
 					if( DEBUG ) {
-						console.log('[Engine] Starting render ...');
+						console.log('[Engine] Rendering ...');
 						var startTime = Math.floor(Date.now() / 1000);
 					}
 
@@ -151,7 +151,7 @@
 
 					if( DEBUG ) {
 						var finishTime = Math.floor(Date.now() / 1000);
-						console.log('[Engine] Done. Image rendered in '+(finishTime - startTime)+' seconds.');
+						console.log('[Engine] Rendering done in '+(finishTime - startTime)+' seconds.');
 					}
 
 					this.flush();
@@ -173,7 +173,7 @@
 			/* Start */
 			Engine.boot('preview-canvas');
 
-			Engine.setRenderer('pathtracer', {traceDepth: 16});
+			Engine.setRenderer('pathtracer', {traceDepth: 8});
 			Engine.setCamera('orthographic', {
 				position: $V([0, 1, -20]),
 				viewportWidth: 20,
