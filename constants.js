@@ -4,7 +4,6 @@ var DEBUG = true;
 
 
 
-
 /* The next constants must not be updated. */
 /* Do not change anything under this line. */
 

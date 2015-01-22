@@ -2,6 +2,9 @@ var Renderer = {};
 
 Renderer.pathtracer = function() {
 
+	this.seedVector = null;
+	this.traceDepth = 6;
+
 	this.vecOrtho = function(v) {
 	    if( Math.abs(v.elements[0]) > Math.abs(v.elements[2]) ) {
 	    	return $V([-v.elements[1], v.elements[0], 0.0]);
@@ -11,29 +14,23 @@ Renderer.pathtracer = function() {
 	}
 
 	this.rand2n = function() {
-		globals.currentSeedVector = globals.currentSeedVector.add($V([-1, 1]));
-
-		var magicVec1 = $V([12.9898, 78.233]);
-		var magicVec2 = $V([4.898, 7.23]);
-
-		var p1 = (Math.sin(globals.currentSeedVector.dot(magicVec1)) * 43758.5453) % 1;
-		var p2 = (Math.cos(globals.currentSeedVector.dot(magicVec2)) * 23421.631) % 1;
-
-	    return $V([p1, p2]);
+		this.seedVector = this.seedVector.add($V([-1, 1]));
+	    return $V([ Math.sin(globals.currentScreenX * Math.random()) % 1, Math.cos(globals.currentScreenY * Math.random()) % 1])
 	}
 
 	this.getRandomVectorInHemisphere = function(normal) {
-		var o1 = this.vecOrtho(normal).toUnitVector();
-		var o2 = normal.cross(o1).toUnitVector();
+		var dir = normal.toUnitVector();;
+		var o1  = this.vecOrtho(dir).toUnitVector();
+		var o2  = dir.cross(o1).toUnitVector();;
 		var r = this.rand2n();
+		r.elements[0] = r.elements[0] * 2 * Math.PI;
 
-		r.elements[0] = r.elements[0] * 2.0 * Math.PI;
 		var oneminus = Math.sqrt(1.0 - r.elements[1] * r.elements[1]);
+		var p1 = o1.multiply(Math.cos(r.elements[0]) * oneminus);
+		var p2 = o2.multiply(Math.sin(r.elements[0]) * oneminus);
+		var p3 = dir.multiply(r.elements[1]);
 
-		var v1 = o1.multiply(Math.cos(r.elements[0]) * oneminus);
-		var v2 = o2.multiply(Math.sin(r.elements[0]) * oneminus)
-		var v3 = normal.multiply(r.elements[1]);
-		return v1.add(v2.add(v3));
+		return p1.add(p2).add(p3);
 	}
 
 	this.getColor = function(intersection) {
@@ -42,15 +39,14 @@ Renderer.pathtracer = function() {
 			var hitNormal = intersection.object.getNormal(hitPosition);
 			var luminance = 1.0;
 
-			var illuminationDepth = 4;
-			var Albedo = 1.6;
-			var matColor = 0.3;
+			var Albedo = 1.2;
+			var matColor = 0.45;
 
-			var baseSeedVector = $V([globals.currentScreenX, globals.currentScreenY]);
-
-			for(var i = 0; i < illuminationDepth; i++) {
-				
-				globals.currentSeedVector = baseSeedVector.multiply(i + 1);
+			for(var i = 0; i < this.traceDepth; i++) {
+				this.seedVector = $V([
+					globals.currentScreenX,
+					globals.currentScreenY
+				]).multiply(i);
 
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
 				luminance *= 2.0 * matColor * Albedo * newDir.dot(hitNormal);
