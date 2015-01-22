@@ -17,11 +17,11 @@ Renderer.pathtracer = function(opts) {
 		var o1 = this.ortho(normal).toUnitVector();
 		var o2 = normal.cross(o1).toUnitVector();
 
-		globals.scaledSeed.add($V([-1, 1]));
+		globals.seed2d = globals.seed2d.add($V([-1, 1]));
 
 		var r = $V([
-			(Math.sin(globals.scaledSeed.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
-			(Math.cos(globals.scaledSeed.dot($V([14.898,7.23]))) * 23421.631) % 1
+			(Math.sin(globals.seed2d.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
+			(Math.cos(globals.seed2d.dot($V([14.898,7.23]))) * 23421.631) % 1
 		]);
 
 		r.elements[0] = r.elements[0] * 2 * Math.PI;
@@ -31,7 +31,13 @@ Renderer.pathtracer = function(opts) {
 		var v2 = o2.multiply(oneminus * Math.sin(r.elements[0]));
 		var v3 = normal.multiply(r.elements[1]);
 
-		return v1.add(v2).add(v3);
+		var finalVector = v1.add(v2).add(v3);
+
+		if( finalVector.dot(normal) < 0 ) {
+			finalVector = finalVector.multiply(-1);
+		}
+
+		return finalVector;
 	}
 
 	this.getBackground = function(direction) {
@@ -51,14 +57,14 @@ Renderer.pathtracer = function(opts) {
 			luminance = new Color(1.0);
 		}
 
+		globals.seed2d = globals.seed2d.multiply(depth + 1);
+
 		if( depth < this.options.traceDepth ) {
 			var intersection = initialRay.cast(Engine.objects);
 
 			if( intersection ) {
 				var hitPosition = intersection.ray.lastHitPosition;
 				var hitNormal = intersection.ray.lastHitNormal;
-
-				globals.scaledSeed = globals.seed2d.multiply(depth + 1);
 
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
 				luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
