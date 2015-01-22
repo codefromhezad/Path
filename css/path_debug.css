@@ -1,0 +1,12 @@
+#__path_debug_div {
+	position: absolute;
+	right: 0;
+	top: 0;
+	padding: 10px;
+	background: #f8f8f8;
+	list-style-type: none;
+}
+
+.__path_debug_object {
+	display: none;
+}
