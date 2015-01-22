@@ -17,8 +17,7 @@
 		<script>
 
 			var globals = {
-				currentScreenX: 0,
-				currentScreenY: 0,
+				seed2d: $V([0, 0])
 			}
 
 			var Ray = function(origin, direction) {
@@ -131,10 +130,8 @@
 					}
 
 					for(var y = 0; y < this.height; y++) {
-						globals.currentScreenY = y;
 						for(var x = 0; x < this.width; x++) {
-							globals.currentScreenX = x;
-
+							globals.seed2d = $V([x, y]);
 							var ray = this.camera.getRay(x, y);
 							
 							var finalColor = this.renderer.getColorForRay(ray);
@@ -173,7 +170,7 @@
 			/* Start */
 			Engine.boot('preview-canvas');
 
-			Engine.setRenderer('pathtracer', {traceDepth: 8});
+			Engine.setRenderer('pathtracer', {traceDepth: 16});
 			Engine.setCamera('orthographic', {
 				position: $V([0, 1, -20]),
 				viewportWidth: 20,

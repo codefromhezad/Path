@@ -7,15 +7,31 @@ Renderer.pathtracer = function(opts) {
 	}
 	this.options = extend(this.defaults, opts);
 
+	this.ortho = function(v) {
+		return Math.abs(v.elements[0]) > Math.abs(v.elements[2]) ? 
+			$V([-v.elements[1], v.elements[0], 0.0]) :
+			$V([0.0, -v.elements[2], v.elements[1]]);
+	}
+
 	this.getRandomVectorInHemisphere = function(normal) {
-		var dir = normal.toUnitVector();
-		var rndDir = $V([-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2]);
+		var o1 = this.ortho(normal).toUnitVector();
+		var o2 = normal.cross(o1).toUnitVector();
 
-		if( rndDir.dot(dir) < 0 ) {
-			rndDir = rndDir.multiply(-1);
-		}
+		globals.scaledSeed.add($V([-1, 1]));
 
-		return rndDir;
+		var r = $V([
+			(Math.sin(globals.scaledSeed.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
+			(Math.cos(globals.scaledSeed.dot($V([14.898,7.23]))) * 23421.631) % 1
+		]);
+
+		r.elements[0] = r.elements[0] * 2 * Math.PI;
+		var oneminus = Math.sqrt(1.0 - r.elements[1] * r.elements[1]);
+
+		var v1 = o1.multiply(oneminus * Math.cos(r.elements[0]));
+		var v2 = o2.multiply(oneminus * Math.sin(r.elements[0]));
+		var v3 = normal.multiply(r.elements[1]);
+
+		return v1.add(v2).add(v3);
 	}
 
 	this.getBackground = function(direction) {
@@ -44,6 +60,8 @@ Renderer.pathtracer = function(opts) {
 		if( intersection ) {
 			var hitPosition = intersection.ray.lastHitPosition;
 			var hitNormal = intersection.ray.lastHitNormal;
+
+			globals.scaledSeed = globals.seed2d.multiply(depth + 1);
 
 			var newDir = this.getRandomVectorInHemisphere(hitNormal);
 			luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
