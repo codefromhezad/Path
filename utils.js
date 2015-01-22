@@ -11,3 +11,7 @@ function extend(obj1, obj2){
 function isNumber(v) {
 	return isFinite(String(v));
 }
+
+function capitalizeString(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
