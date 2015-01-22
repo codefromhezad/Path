@@ -1,9 +1,13 @@
 var Renderer = {};
 
-Renderer.pathtracer = function() {
+Renderer.pathtracer = function(opts) {
+
+	this.defaults = {
+		traceDepth: 6
+	}
+	this.options = extend(this.defaults, opts);
 
 	this.seedVector = null;
-	this.traceDepth = 6;
 
 	this.getRandomVectorInHemisphere = function(normal) {
 		var dir = normal.toUnitVector();
@@ -25,7 +29,7 @@ Renderer.pathtracer = function() {
 			var Albedo = 1.2;
 			var matColor = 0.45;
 
-			for(var i = 0; i < this.traceDepth; i++) {
+			for(var i = 0; i < this.options.traceDepth; i++) {
 				this.seedVector = $V([
 					globals.currentScreenX,
 					globals.currentScreenY
@@ -54,7 +58,6 @@ Renderer.zBuffer = function(opts) {
 		minDepth: 0,
 		maxDepth: 20 
 	}
-
 	this.options = extend(this.defaults, opts);
 
 	this.getColor = function(intersection) {
