@@ -22,7 +22,6 @@ Renderer.pathtracer = function(opts) {
 		var r  = this.rand2D();
 
 		r.elements[0] = r.elements[0] * 2.0 * Math.PI;
-		//r.elements[1] = Math.pow(r.elements[1], 0.5);
 
 		var oneminus = Math.sqrt(1.0 - r.elements[1] * r.elements[1]);
 
@@ -36,7 +35,11 @@ Renderer.pathtracer = function(opts) {
 	}
 
 	this.getBackground = function(direction) {
-		return new Color(1.0);
+		if( direction.elements[1] > 0 ) {
+			return new Color(1.0);
+		} else {
+			return new Color(0.2);
+		}
 	}
 
 	this.getColorForRay = function(initialRay, luminance, depth) {
