@@ -43,6 +43,20 @@ var Color = function(r, g, b) {
 		return newColor;
 	}
 
+	this.add = function(v) {
+		if( isNumber(v) ) {
+			v = new Color(v);
+		}
+		
+		var newColor = new Color(
+			this.r + v.r,
+			this.g + v.g,
+			this.b + v.b
+		);
+		newColor.update();
+		return newColor;
+	}
+
 	this.setAlpha = function(alpha) {
 		this.a = alpha;
 	}

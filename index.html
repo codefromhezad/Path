@@ -66,7 +66,8 @@
 				this.renderer;
 				this.objects = [];
 
-				this.seed2d = $V([0.0, 0.0]);
+				this.samplesPerPixel;
+				this.one_over_samplesPerPixel;
 
 				this.boot = function(canvasId) {
 					this.canvas = document.getElementById(canvasId);
@@ -80,11 +81,18 @@
 
 					this.aspectRatio = this.height / this.width;
 
+					this.setSamplesPerPixel(1);
+
 					Debug.as('engine').show('Booting with settings: ', {width: this.width, height: this.height, aspectRatio: this.aspectRatio});
 					
 					for(var i = 0; i < this.width; i++) {
 						this.screenBuffer[i] = [];
 					}
+				}
+
+				this.setSamplesPerPixel = function(numSamples) {
+					this.samplesPerPixel = numSamples;
+					this.one_over_samplesPerPixel = 1.0 / this.samplesPerPixel;
 				}
 
 				this.setRenderer = function(rendererName, opts) {
@@ -139,11 +147,16 @@
 
 					var renderProcess = function() {
 						for(var x = 0; x < that.width; x++) {
-							var ray = that.camera.getRay(x, y);
-
-							that.seed2d = $V([x, y]);
 							
-							var finalColor = that.renderer.getColorForRay(ray);
+							var ray = that.camera.getRay(x, y);
+							var finalColor = new Color(0.0);
+
+							for(var i = 0; i < that.samplesPerPixel; i++) {
+								finalColor = finalColor.add(that.renderer.getColorForRay(ray));
+							}
+
+							finalColor = finalColor.multiply(that.one_over_samplesPerPixel);
+
 							that.setPixel(x, y, finalColor.to255());
 						}
 
@@ -180,6 +193,7 @@
 			$( function() {
 				Engine.boot('preview-canvas');
 
+				Engine.setSamplesPerPixel(20);
 				Engine.setRenderer('pathtracer', {traceDepth: 8});
 				Engine.setCamera('orthographic', {
 					position: $V([0, 1, -20]),
@@ -188,7 +202,10 @@
 				});
 
 				Engine.objects.push(new Entity.sphere( $V([-5, 1, 10]), 4));
-				Engine.objects.push(new Entity.sphere( $V([4, 1, 10]), 4));
+				Engine.objects.push(new Entity.sphere( $V([4, -1, 10]), 4));
+				Engine.objects.push(new Entity.sphere( $V([5, 1, 17]), 4));
+				Engine.objects.push(new Entity.sphere( $V([-5, -1, 19]), 5));
+
 				Engine.objects.push(new Entity.plane( $V([0, -3, 11]), $V([0, 0.8, -0.2])));
 
 				Engine.render();

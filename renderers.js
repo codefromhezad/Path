@@ -1,9 +1,8 @@
 var Renderer = {};
 
 Renderer.pathtracer = function(opts) {
-
 	this.defaults = {
-		traceDepth: 6
+		traceDepth: 8
 	}
 	this.options = extend(this.defaults, opts);
 
@@ -14,12 +13,7 @@ Renderer.pathtracer = function(opts) {
 	}
 
 	this.rand2D = function() {
-		Engine.seed2d = Engine.seed2d.add($V([-1, 1]));
-		
-		return $V([
-			(Math.sin(Engine.seed2d.dot($V([12.9898, 78.233]))) * 43758.5453) % 1,
-			(Math.cos(Engine.seed2d.dot($V([14.898,7.23]))) * 23421.631) % 1
-		]);
+		return $V([Math.random(), Math.random()]);
 	}
 
 	this.getRandomVectorInHemisphere = function(normal) {
@@ -28,6 +22,7 @@ Renderer.pathtracer = function(opts) {
 		var r  = this.rand2D();
 
 		r.elements[0] = r.elements[0] * 2.0 * Math.PI;
+		//r.elements[1] = Math.pow(r.elements[1], 0.5);
 
 		var oneminus = Math.sqrt(1.0 - r.elements[1] * r.elements[1]);
 
@@ -35,11 +30,7 @@ Renderer.pathtracer = function(opts) {
 		var v2 = o2.multiply(oneminus * Math.sin(r.elements[0]));
 		var v3 = normal.multiply(r.elements[1]);
 
-		var finalVector = v1.add(v2.add(v3));
-
-		if( finalVector.dot(normal) < 0 ) {
-			finalVector = finalVector.multiply(-1);
-		}
+		var finalVector = v1.add(v2).add(v3);
 
 		return finalVector;
 	}
@@ -50,8 +41,8 @@ Renderer.pathtracer = function(opts) {
 
 	this.getColorForRay = function(initialRay, luminance, depth) {
 		
-		var Albedo = 1.2;
-		var matColor = 0.45;
+		var Albedo = 0.8;
+		var matColor = new Color(0.88, 0.91, 1.0);
 
 		if( depth === undefined ) {
 			depth = 0;
@@ -62,9 +53,6 @@ Renderer.pathtracer = function(opts) {
 		}
 
 		if( depth < this.options.traceDepth ) {
-
-			Engine.seed2d = Engine.seed2d.multiply(depth + 1);
-
 			var intersection = initialRay.cast(Engine.objects);
 
 			if( intersection ) {
@@ -72,8 +60,11 @@ Renderer.pathtracer = function(opts) {
 				var hitNormal = intersection.ray.lastHitNormal;
 
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
-				luminance = luminance.multiply( 2.0 * matColor * Albedo * newDir.dot(hitNormal) );
 				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_VECTOR_DIST_ADD * 2));
+
+				var cosTheta = Math.abs(newDir.dot(hitNormal));
+
+				luminance = luminance.multiply( matColor.multiply(Albedo) );
 
 				var newRay = new Ray(newOrigin, newDir);
 				

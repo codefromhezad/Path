@@ -59,11 +59,12 @@ var Debug = new (function(is_active) {
 		}
 
 		if( addItemEveryNPercent === undefined ) {
-			addItemEveryNPercent = 10;
+			addItemEveryNPercent = 1;
 		}
 		var percent = (100 * (currentValue + 1) / finalValue);
 		if( percent % addItemEveryNPercent == 0 ) {
-			$('.__path_debug_process_progress').attr('data-progress', percent).find('.__path_progress_indicator').width(percent+'%').html(percent + '%');
+			$('.__path_debug_process_progress').attr('data-progress', percent).find('.__path_progress_indicator').width(percent+'%');
+			$('.__path_progress_status').html(percent + '%');
 		}
 	}
 
