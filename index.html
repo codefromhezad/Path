@@ -18,6 +18,7 @@
 		<script src="constants.js"></script>
 		<script src="utils.js"></script>
 		<script src="debug.js"></script>
+		<script src="ray.js"></script>
 		<script src="color.js"></script>
 		<script src="renderers.js"></script>
 		<script src="cameras.js"></script>
@@ -27,36 +28,6 @@
 		<canvas id="preview-canvas" width="200" height="200"></canvas>
 
 		<script>
-
-			var Ray = function(origin, direction) {
-				this.origin = origin;
-				this.direction = direction;
-
-				this.lastHitPosition = null;
-				this.lastHitNormal = null;
-
-				this.cast = function(sceneObjects) {
-					var nearestIntersection = null;
-
-					for(var n in sceneObjects) {
-						var o = sceneObjects[n];
-						var intersection = o.intersect(this);
-
-						if( intersection && intersection.status == INTERSECT_OK ) {
-							if( (! nearestIntersection) || nearestIntersection.distance > intersection.distance ) {
-								nearestIntersection = intersection;
-							}
-						}
-					}
-
-					if( nearestIntersection ) {
-						this.lastHitPosition = nearestIntersection.ray.origin.add(nearestIntersection.ray.direction.multiply(nearestIntersection.distance));
-						this.lastHitNormal = nearestIntersection.object.getNormal(this.lastHitPosition);
-					}
-
-					return nearestIntersection;
-				}
-			}
 
 			var Engine = new (function() {
 
