@@ -26,7 +26,7 @@ var Debug = new (function(is_active) {
 		this.$currentElement = this.$wrapperElement;
 	}
 
-	this.parseItem = function(what) {
+	this.parseVariable = function(what) {
 		if( typeof what === "object" ) {
 			what = '<a href="#" class="__path_debug_obj_more">[Object]</a>'+
 					  '<pre class="__path_debug_object">' + JSON.stringify(what, undefined, 2) + '</pre>';
@@ -53,18 +53,21 @@ var Debug = new (function(is_active) {
 		$baseItem.append($newElement);
 	}
 
-	this.updateProgress = function(currentValue, finalValue, addItemEveryNPercent) {
+	this.updateProgress = function(currentValue, finalValue, optionalMessage) {
 		if( ! this.is_active ) {
 			return;
 		}
 
-		if( addItemEveryNPercent === undefined ) {
-			addItemEveryNPercent = 1;
+		if( ! optionalMessage ) {
+			optionalMessage = "";
+		} else {
+			optionalMessage += ": ";
 		}
+
 		var percent = (100 * (currentValue + 1) / finalValue);
-		if( percent % addItemEveryNPercent == 0 ) {
+		if( percent % 1 == 0 ) {
 			$('.__path_debug_process_progress').attr('data-progress', percent).find('.__path_progress_indicator').width(percent+'%');
-			$('.__path_progress_status').html(percent + '%');
+			$('.__path_progress_status').html(optionalMessage+percent + '%');
 		}
 	}
 
@@ -89,7 +92,7 @@ var Debug = new (function(is_active) {
 
 		var $newItem = $('<li class="'+itemCategoryClass+'"></li>');
 		
-		content = itemCategoryLabel + this.parseItem(content);
+		content = itemCategoryLabel + this.parseVariable(content);
 
 		$newItem.html(content);
 
@@ -115,7 +118,7 @@ var Debug = new (function(is_active) {
 		var finalElement = "";
 
 		for(var i = 0; i < arguments.length; i++) {
-			finalElement += this.parseItem(arguments[i]);
+			finalElement += this.parseVariable(arguments[i]);
 		}
 
 		var $newItem = this.addItem(finalElement);
