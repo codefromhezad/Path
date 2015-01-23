@@ -40,6 +40,9 @@
 				this.samplesPerPixel;
 				this.one_over_samplesPerPixel;
 
+				this.progressiveResolutions;
+				this.currentProgressivePass;
+
 				this.boot = function(canvasId) {
 					this.canvas = document.getElementById(canvasId);
 					this.ctx    = this.canvas.getContext('2d');
@@ -53,6 +56,8 @@
 					this.aspectRatio = this.height / this.width;
 
 					this.setSamplesPerPixel(1);
+
+					this.setProgressiveRenderLevels(4);
 
 					Debug.as('engine').show('Booting with settings: ', {width: this.width, height: this.height, aspectRatio: this.aspectRatio});
 					
@@ -101,6 +106,41 @@
 					}
 				}
 
+				this.renderChunk = function(x0, y0, x1, y1) {
+					var cw = x1 - x0;
+					var ch = y1 - y0;
+
+					var cw_2 = Math.floor(cw * 0.5);
+					var ch_2 = Math.floor(ch * 0.5);
+
+					var px = Math.floor(x0 + cw_2);
+					var py = Math.floor(y0 + ch_2);
+
+
+					var ray = this.camera.getRay(px, py);
+					var finalColor = new Color(0.0);
+
+					for(var i = 0; i < this.samplesPerPixel; i++) {
+						finalColor = finalColor.add(this.renderer.getColorForRay(ray));
+					}
+
+					finalColor = finalColor.multiply(this.one_over_samplesPerPixel).to255();
+
+					for(var nx = x0; nx < x1; nx ++) {
+						for(var ny = y0; ny < y1; ny ++) {
+							this.setPixel(nx, ny, finalColor);
+						}
+					}
+				}
+
+				this.setProgressiveRenderLevels = function(numLevels) {
+					this.progressiveResolutions = [];
+					for(var l = 1; l <= numLevels; l++) {
+						this.progressiveResolutions.push([Math.floor(this.width / l), Math.floor(this.height/l)]);
+					}
+					this.progressiveResolutions.reverse();
+				} 
+
 				this.render = function() {
 					if( ! this.camera ) {
 						console.error('A camera must be defined.');
@@ -112,38 +152,49 @@
 					}
 
 					Debug.as('engine').startProcess('Render');
-
-					var y = 0;
+					
 					var that = this;
 
+					var ri = 0;
 					var renderProcess = function() {
-						for(var x = 0; x < that.width; x++) {
-							
-							var ray = that.camera.getRay(x, y);
-							var finalColor = new Color(0.0);
+						var res = that.progressiveResolutions[ri];
 
-							for(var i = 0; i < that.samplesPerPixel; i++) {
-								finalColor = finalColor.add(that.renderer.getColorForRay(ray));
+						var chunkWidth = that.width / res[0];
+						var chunkHeight = that.height / res[1];
+
+						var y = 0;
+
+						var chunkLineProcess = function() {
+							for(var x = 0; x < res[0]; x++) {
+								var xw = x * chunkWidth;
+								var yh = y * chunkHeight;
+
+								that.currentProgressivePass = ri;
+
+								that.renderChunk(xw, yh, xw + chunkWidth, yh + chunkHeight);
+
+								var passPercentFactor = that.currentProgressivePass / that.progressiveResolutions.length;
+								Debug.updateProgress(y, res[1], 'Pass '+(that.currentProgressivePass + 1)+'/'+that.progressiveResolutions.length);
 							}
 
-							finalColor = finalColor.multiply(that.one_over_samplesPerPixel);
+							y += 1;
 
-							that.setPixel(x, y, finalColor.to255());
+							that.flush();
+
+							if (y < res[1]) {
+							    setTimeout(chunkLineProcess, 1);
+							} else {
+								ri += 1;
+
+								if( ri < that.progressiveResolutions.length ) {
+									setTimeout(renderProcess, 1);
+								} else {
+									Debug.stopProcess();
+								}
+							}
 						}
-
-						Debug.updateProgress(y, that.height);
-
-						y += 1;
-
-						that.flush();
-
-						if (y < that.height) {
-						    setTimeout(renderProcess, 1);
-						} else {
-							Debug.stopProcess();
-						}
+						chunkLineProcess();
 					}
-
 					renderProcess();
 				}
 
@@ -164,7 +215,7 @@
 			$( function() {
 				Engine.boot('preview-canvas');
 
-				Engine.setSamplesPerPixel(20);
+				Engine.setSamplesPerPixel(2);
 				Engine.setRenderer('pathtracer', {traceDepth: 8});
 				Engine.setCamera('orthographic', {
 					position: $V([0, 1, -20]),
