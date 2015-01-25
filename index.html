@@ -215,21 +215,20 @@
 				Engine.boot('preview-canvas');
 
 				Engine.setProgressiveRenderLevels(4);
-				Engine.setSamplesPerPixel(10);
-				
+				Engine.setSamplesPerPixel(20);
+
 				Engine.setRenderer('pathtracer', {traceDepth: 8});
-				Engine.setCamera('orthographic', {
-					position: $V([0, 1, -20]),
-					viewportWidth: 20,
+				Engine.setCamera('perspective', {
+					position: $V([0, 2, -20]),
+					viewportWidth: 10,
 					viewportDistance: 20
 				});
 
 				Engine.objects.push(new Entity.sphere( $V([-5, 1, 10]), 4));
 				Engine.objects.push(new Entity.sphere( $V([4, -1, 10]), 4));
-				Engine.objects.push(new Entity.sphere( $V([5, 1, 17]), 4));
-				Engine.objects.push(new Entity.sphere( $V([-5, -1, 19]), 5));
 
-				Engine.objects.push(new Entity.plane( $V([0, -3, 11]), $V([0, 0.8, -0.2])));
+				Engine.objects.push(new Entity.plane( $V([0, -3, 0]), $V([0, 1, 0])));
+				//Engine.objects.push(new Entity.plane( $V([0, 0, 15]), $V([0, 0, -1])));
 
 				Engine.render();
 			});
