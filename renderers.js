@@ -65,9 +65,10 @@ Renderer.pathtracer = function(opts) {
 				var newDir = this.getRandomVectorInHemisphere(hitNormal);
 				var newOrigin = hitPosition.add(hitNormal.multiply(MIN_VECTOR_DIST_ADD * 2));
 
-				var cosTheta = Math.abs(newDir.dot(hitNormal));
+				var matColor = intersection.object.material.color;
+				var albedo = intersection.object.material.albedo;
 
-				luminance = luminance.multiply( matColor.multiply(Albedo) );
+				luminance = luminance.multiply( matColor.multiply(albedo) );
 
 				var newRay = new Ray(newOrigin, newDir);
 				
