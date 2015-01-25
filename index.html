@@ -215,12 +215,11 @@
 				Engine.boot('preview-canvas');
 
 				Engine.setProgressiveRenderLevels(4);
-				Engine.setSamplesPerPixel(20);
+				Engine.setSamplesPerPixel(10);
 
-				Engine.setRenderer('pathtracer', {traceDepth: 8});
+				Engine.setRenderer('pathtracer', {traceDepth: 4});
 				Engine.setCamera('perspective', {
-					position: $V([0, 2, -20]),
-					viewportWidth: 10,
+					viewportWidth: 20,
 					viewportDistance: 20
 				});
 

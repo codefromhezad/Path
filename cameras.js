@@ -34,32 +34,36 @@ Camera.orthographic = function(opts) {
 
 Camera.perspective = function(opts) {
 	this.defaults = {
-		position: $V([0, 0, -2]),
-		direction: $V([0, 0, 1]),
+		position: $V([0, 1, -2]),
+		lookAt: $V([0, 0, 10]),
 		viewportWidth: 20,
 		viewportDistance: 10
 	}
 	this.options = extend(this.defaults, opts);
 
 	this.position = this.options.position;
+	this.lookAt = this.options.lookAt;
 	this.viewportWidth = this.options.viewportWidth;
 	this.viewportHeight = this.options.viewportWidth * Engine.aspectRatio;
-	this.viewportDistance =this.options.viewportDistance;
+	this.viewportDistance = this.options.viewportDistance;
 
-	this.position.elements[2] -= this.viewportDistance;
+	var xLerp = this.viewportWidth / Engine.width;
+	var yLerp = this.viewportHeight / Engine.height;
+
+	var upVector = $V([0, 1, 0]);
+
+	var rightVector = this.position.subtract(this.lookAt).cross( upVector.subtract(this.position) );
+	var d = this.lookAt.subtract(this.position).toUnitVector();
+
+	var v1 = d.multiply(this.viewportDistance);
+	var v2 = upVector.multiply(this.viewportHeight * 0.5);
+	var v3 = rightVector.multiply(this.viewportWidth * 0.5);
+
+	var viewPlaneUpLeft = this.position.add(v1).add(v2).subtract(v3);
 
 	this.getRay = function(x, y) {
-		var xLerp = x / Engine.width;
-		var yLerp = y / Engine.height;
-
-		var pArr = [];
-		pArr[0] = -this.viewportWidth * 0.5 + this.viewportWidth * xLerp;
-		pArr[1] = this.viewportHeight * 0.5 - this.viewportHeight * yLerp;
-		pArr[2] = -this.viewportDistance;
-
-		var d = $V([pArr[0], pArr[1], this.viewportDistance]).toUnitVector();
-		var p = this.position;
-
-		return new Ray(p, d);
+		var pixelViewVector = viewPlaneUpLeft.add(rightVector.multiply(xLerp * x)).subtract(upVector.multiply(yLerp * y)).toUnitVector();
+		
+		return new Ray(this.position, pixelViewVector);
 	}
 }
