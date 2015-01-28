@@ -32,11 +32,11 @@
 
 			var Engine = new (function() {
 
-				this.screenBuffer = [];
-
 				this.camera;
 				this.renderer;
 				this.objects = [];
+
+				this.aspectRatio;
 
 				this.samplesPerPixel;
 				this.one_over_samplesPerPixel;
@@ -60,11 +60,11 @@
 
 					this.setProgressiveRenderLevels(1);
 
-					Debug.as('engine').show('Booting with settings: ', {width: this.width, height: this.height, aspectRatio: this.aspectRatio});
-					
-					for(var i = 0; i < this.width; i++) {
-						this.screenBuffer[i] = [];
-					}
+					Debug.as('engine').show('Booting with settings: ', {
+						width: this.width,
+						height: this.height,
+						aspectRatio: this.aspectRatio
+					});
 				}
 
 				this.addObject = function(object, material) {
@@ -125,10 +125,9 @@
 					var px = Math.floor(x0 + cw_2);
 					var py = Math.floor(y0 + ch_2);
 
-
 					var ray = this.camera.getRay(px, py);
-					var finalColor = new Color(0.0);
 
+					var finalColor = new Color(0.0);
 					for(var i = 0; i < this.samplesPerPixel; i++) {
 						finalColor = finalColor.add(this.renderer.getColorForRay(ray));
 					}
@@ -224,9 +223,9 @@
 				Engine.boot('preview-canvas');
 
 				Engine.setProgressiveRenderLevels(4);
-				Engine.setSamplesPerPixel(10);
+				Engine.setSamplesPerPixel(4);
 
-				Engine.setRenderer('pathtracer', {traceDepth: 4});
+				Engine.setRenderer('pathtracer', {traceDepth: 8});
 				Engine.setCamera('perspective', {
 					viewportWidth: 20,
 					viewportDistance: 20

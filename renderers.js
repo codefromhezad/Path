@@ -44,9 +44,6 @@ Renderer.pathtracer = function(opts) {
 
 	this.getColorForRay = function(initialRay, luminance, depth) {
 		
-		var Albedo = 0.8;
-		var matColor = new Color(0.88, 0.91, 1.0);
-
 		if( depth === undefined ) {
 			depth = 0;
 		}

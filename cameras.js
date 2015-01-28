@@ -46,7 +46,7 @@ Camera.perspective = function(opts) {
 	this.viewportWidth = this.options.viewportWidth;
 	this.viewportHeight = this.options.viewportWidth * Engine.aspectRatio;
 	this.viewportDistance = this.options.viewportDistance;
-
+	
 	var xLerp = this.viewportWidth / Engine.width;
 	var yLerp = this.viewportHeight / Engine.height;
 
