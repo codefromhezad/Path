@@ -46,13 +46,13 @@ Camera.perspective = function(opts) {
 	this.viewportWidth = this.options.viewportWidth;
 	this.viewportHeight = this.options.viewportWidth * Engine.aspectRatio;
 	this.viewportDistance = this.options.viewportDistance;
-	
+
 	var xLerp = this.viewportWidth / Engine.width;
 	var yLerp = this.viewportHeight / Engine.height;
 
 	var upVector = $V([0, 1, 0]);
 
-	var rightVector = this.position.subtract(this.lookAt).cross( upVector.subtract(this.position) );
+	var rightVector = this.position.subtract(this.lookAt).cross( upVector.subtract(this.position) ).toUnitVector();
 	var d = this.lookAt.subtract(this.position).toUnitVector();
 
 	var v1 = d.multiply(this.viewportDistance);
@@ -62,7 +62,10 @@ Camera.perspective = function(opts) {
 	var viewPlaneUpLeft = this.position.add(v1).add(v2).subtract(v3);
 
 	this.getRay = function(x, y) {
-		var pixelViewVector = viewPlaneUpLeft.add(rightVector.multiply(xLerp * x)).subtract(upVector.multiply(yLerp * y)).toUnitVector();
+		var rightFactor = rightVector.multiply(xLerp * x);
+		var upFactor    = upVector.multiply(yLerp * y);
+
+		var pixelViewVector = viewPlaneUpLeft.add(rightFactor).subtract(upFactor);
 		
 		return new Ray(this.position, pixelViewVector);
 	}
